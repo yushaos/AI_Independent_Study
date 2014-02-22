@@ -276,7 +276,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         # current node is pacman (max agent)
         if( currAgt == 'pacman' ):
-
+            score = -9999
             # get all possible move for current game state
             actions = state.getLegalActions(agentIndex % totalNumAng)
             # remove 'stop' as one the the legal action
@@ -286,14 +286,16 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             for action in actions:
                 nextDepthState = state.generateSuccessor(agentIndex % totalNumAng, action)
 
-                alpha = max(alpha, AlphaBetaFunc(nextDepthState, alpha, beta, agentIndex+1))
+                score = max(score, AlphaBetaFunc(nextDepthState, alpha, beta, agentIndex+1))
                 # beta cutoff
-                if( beta <= alpha):
-                    break
-            return (alpha)
+                if( score > beta ):
+                    return( score )
+                alpha = max( alpha, score )
+            return (score)
 
         # current node is ghost (min agent)
         else:
+            score = 9999
             # get all possible move for current game state
             actions = state.getLegalActions(agentIndex % totalNumAng)
             # remove 'stop' as one the the legal action
@@ -303,11 +305,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             for action in actions:
                 nextDepthState = state.generateSuccessor(agentIndex % totalNumAng, action)
 
-                beta = min(beta, AlphaBetaFunc(nextDepthState, alpha, beta, agentIndex+1))
+                score = min(score, AlphaBetaFunc(nextDepthState, alpha, beta, agentIndex+1))
                 # alpha cut off
-                if( beta <= alpha ):
-                    break
-            return(beta)
+                if( score < alpha ):
+                    return( score )
+                beta = min( score, beta )
+            return(score)
 
         raise Exception("Should not reach here")
 
