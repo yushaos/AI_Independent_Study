@@ -402,108 +402,108 @@ def foodHeuristic(state, problem):
   #list of dots to eat
   Foodlist = foodGrid.asList()
 
-##  #----------------------------------------------------------------------------
-##  #Herisitic 2, cost , node expanded
-##  #description: use prim algorithm to calculate shorest distance to travel to
-##  #all dots. Distance is using manhattan distance
-##  #----------------------------------------------------------------------------
-##  #build the map for prim algorithm first, note: try only build once, and reuse
-##  #by future heuristic calculation
-####  if 'primMap' not in problem.heuristicInfo:
-##  primMap = []
-##
-##
-##  #Add position into foodlist dot
-##  #format:
-##  #{(dot1):[(distance to dot1),(distance to dot2)...],
-##  # (dot2):[(distance to dot1),(distance to dot2)...],
-##  #...
-##  #... }
-##
-##  #add the pacman position into search list
-##  Foodlist.append(position)
-##
-##  for dot in Foodlist:
-##    #reset primlist
-##    primlist = []
-##    for dot2 in Foodlist:
-##      manhattanDistance = util.manhattanDistance(dot, dot2)
-##      primlist.append(manhattanDistance)
-##    primMap.append(primlist)
-##
-####    #save the prim map for resue, only calculate once
-####    problem.heuristicInfo['primMap']   = primMap
-##
-##  #map Foodlist to interger list
-##  FoodlistDic = {}
-##  FoodlistDic2 = {}
-##  for i, dot in enumerate(Foodlist):
-##    FoodlistDic[i] = dot
-##    FoodlistDic2[dot] = i
-##
-##  Foodlist_list = []
-##  for i in range(0, len(primMap)):
-##    Foodlist_list.append(i)
-##
-##  #import primalgoritm method
-##  import primAlgoritm
-##
-##  #call PrimAlgorithm method
-##  ParentDot, Dotcost = primAlgoritm.prim(Foodlist_list, primMap, FoodlistDic2[position])
-##
-####    #save data for future use
-####    #ParentCostMap format:
-####    # {(dot1):(parent dot, travel cost),
-####    #  (dot2):(parent dot, travel cost),...}
-####    ParentCostMap = {}
-####    for i, dot in enumerate(ParentDot):
-####      #Pacman position has not starting dot
-####      if( dot != None ):
-####        ParentCostMap[ FoodlistDic[i] ] = (FoodlistDic[dot], Dotcost[i])
-####    problem.heuristicInfo['ParentCostMap']   = ParentCostMap
-##
-##
-##
-##
-##  #total prim graph cost, remove None-digit element,
-##  Dotcost = [ x for x in Dotcost if isinstance(x, int) ]
-##  totalPrimCost = sum(Dotcost)
-##  heuristcValue = totalPrimCost
-####    problem.heuristicInfo['totalPrimCost']   = totalPrimCost
-##  return heuristcValue
-
-
-
   #----------------------------------------------------------------------------
-  #Herisitic 1, cost 27, node expanded 1250
-  #description: manhattan distance for each dot to its closest dot, and its
-  #closest dot, until all the dot is travelled.
+  #Herisitic 2, cost , node expanded
+  #description: use prim algorithm to calculate shorest distance to travel to
+  #all dots. Distance is using manhattan distance
   #----------------------------------------------------------------------------
-  #find the dot closed dot
-  visitedDot = []
-  totalDistance = 0
-  minDot = None
-  #add the pacman position to visited list, then find its closest dot
-  #visitedDot.append(position)
+  #build the map for prim algorithm first, note: try only build once, and reuse
+  #by future heuristic calculation
+##  if 'primMap' not in problem.heuristicInfo:
+  primMap = []
+
+
+  #Add position into foodlist dot
+  #format:
+  #{(dot1):[(distance to dot1),(distance to dot2)...],
+  # (dot2):[(distance to dot1),(distance to dot2)...],
+  #...
+  #... }
+
+  #add the pacman position into search list
+  Foodlist.append(position)
 
   for dot in Foodlist:
-    #Can not change Foodlist directly, need to work on a copy
-    remainFoodlist = Foodlist[:]
-    remainFoodlist.remove(dot)
-    minDistance = 9999
+    #reset primlist
+    primlist = []
+    for dot2 in Foodlist:
+      manhattanDistance = util.manhattanDistance(dot, dot2)
+      primlist.append(manhattanDistance)
+    primMap.append(primlist)
 
-    #Find the dot to its closest dot
-    for dot2 in remainFoodlist:
-        mahatonDistance = abs(dot2[0] - dot[0])+abs(dot2[1] - dot[1])
-        if mahatonDistance < minDistance:
-          minDistance = mahatonDistance
-          minDot = dot2
-      #after one round search, closest is visited dot
-    if( minDot != None):
-      visitedDot.append(minDot)
-      totalDistance += minDistance
+##    #save the prim map for resue, only calculate once
+##    problem.heuristicInfo['primMap']   = primMap
 
-  return totalDistance
+  #map Foodlist to interger list
+  FoodlistDic = {}
+  FoodlistDic2 = {}
+  for i, dot in enumerate(Foodlist):
+    FoodlistDic[i] = dot
+    FoodlistDic2[dot] = i
+
+  Foodlist_list = []
+  for i in range(0, len(primMap)):
+    Foodlist_list.append(i)
+
+  #import primalgoritm method
+  import primAlgoritm
+
+  #call PrimAlgorithm method
+  ParentDot, Dotcost = primAlgoritm.prim(Foodlist_list, primMap, FoodlistDic2[position])
+
+##    #save data for future use
+##    #ParentCostMap format:
+##    # {(dot1):(parent dot, travel cost),
+##    #  (dot2):(parent dot, travel cost),...}
+##    ParentCostMap = {}
+##    for i, dot in enumerate(ParentDot):
+##      #Pacman position has not starting dot
+##      if( dot != None ):
+##        ParentCostMap[ FoodlistDic[i] ] = (FoodlistDic[dot], Dotcost[i])
+##    problem.heuristicInfo['ParentCostMap']   = ParentCostMap
+
+
+
+
+  #total prim graph cost, remove None-digit element,
+  Dotcost = [ x for x in Dotcost if isinstance(x, int) ]
+  totalPrimCost = sum(Dotcost)
+  heuristcValue = totalPrimCost
+##    problem.heuristicInfo['totalPrimCost']   = totalPrimCost
+  return heuristcValue
+
+
+
+##  #----------------------------------------------------------------------------
+##  #Herisitic 1, cost 27, node expanded 1250
+##  #description: manhattan distance for each dot to its closest dot, and its
+##  #closest dot, until all the dot is travelled.
+##  #----------------------------------------------------------------------------
+##  #find the dot closed dot
+##  visitedDot = []
+##  totalDistance = 0
+##  minDot = None
+##  #add the pacman position to visited list, then find its closest dot
+##  #visitedDot.append(position)
+##
+##  for dot in Foodlist:
+##    #Can not change Foodlist directly, need to work on a copy
+##    remainFoodlist = Foodlist[:]
+##    remainFoodlist.remove(dot)
+##    minDistance = 9999
+##
+##    #Find the dot to its closest dot
+##    for dot2 in remainFoodlist:
+##        mahatonDistance = abs(dot2[0] - dot[0])+abs(dot2[1] - dot[1])
+##        if mahatonDistance < minDistance:
+##          minDistance = mahatonDistance
+##          minDot = dot2
+##      #after one round search, closest is visited dot
+##    if( minDot != None):
+##      visitedDot.append(minDot)
+##      totalDistance += minDistance
+##
+##  return totalDistance
 
 ##  #----------------------------------------------------------------------------
 ##  # Null heristic, cost 27, node expanded 5366
