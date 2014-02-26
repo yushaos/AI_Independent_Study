@@ -4,6 +4,8 @@ import random, util
 
 from game import Agent
 
+
+
 class ReflexAgent(Agent):
   """
     A reflex agent chooses an action at each choice point by examining
@@ -178,7 +180,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if( agentIndex >= self.depth * totalNumAng
            or state.isWin()
            or state.isLose() ):
-            score = self.evaluationFunction( state )
+            score = better( state )
             return (score)
 
         #Determine current agent and next agentIndex agent type: min or max
@@ -234,7 +236,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         actions.remove('Stop')
 
     # Find the best evaluated result from root node's children actions
-    MaxValue = -9999
+    MaxValue = -999999
     for action in actions:
         nextDepthState = gameState.generateSuccessor(agentIndex, action)
 
@@ -244,8 +246,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
             MaxValue = score
             BestAction = action
 
-
     return( BestAction )
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
@@ -361,14 +363,77 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
     util.raiseNotDefined()
 
 def betterEvaluationFunction(currentGameState):
-  """
+    """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
     DESCRIPTION: <write something here so we know what you did>
-  """
-  "*** YOUR CODE HERE ***"
-  util.raiseNotDefined()
+    """
+    "*** YOUR CODE HERE ***"
+
+    #End the score evaluation if the games ends
+    if( currentGameState.isLose() ):
+        FinalScore = -999
+        return( FinalScore )
+
+    elif( currentGameState.isWin() ):
+        FinalScore = 999
+        return( FinalScore )
+
+    else:
+        # Useful information you can extract from a GameState
+        PacmanPos = currentGameState.getPacmanPosition()
+        DotList = currentGameState.getFood()
+        GhostStates = currentGameState.getGhostStates()
+        newScaredTimes = [ghostState.scaredTimer for ghostState in GhostStates]
+        FinalScore = 0
+
+        # ScaredTable is defined in the global variable on top of file
+        ScareTable = {0:-200, 1:-100, 2:-12, 3:-4, 4:-1.5, 5:-0.75, 6:-0.436, 7:-0.273,8:-0.2, 9:-0.1, 10:-0.05}
+
+        # Evaluate each ghost from Pacman
+        for i, ghost in enumerate( GhostStates ):
+            dist = manhattanDistance(PacmanPos, ghost.getPosition())
+
+            # If the scare timer is off, or close to expire, pacman try to run away from ghosts
+            if( newScaredTimes[i] <= 1 ):
+                # Get score of ghost from scare table
+                # If not in scaretable, assume ghost is far away, no impact on eval score
+                if( ScareTable.has_key(dist) ):
+                    FinalScore += ScareTable[dist]
+
+            # Scared timer is on, try to eat ghost for extra point if possible
+            # the reward to chase scared ghosts should be less than voiding not scared ghosts
+            else:
+                if( ScareTable.has_key(dist)):
+                    FinalScore += -1.0 * ScareTable[dist] * 0.8
+
+        #If current state has dots, it should be rewarded
+        if( currentGameState.hasFood(PacmanPos[0], PacmanPos[1]) ):
+            # scale to the point where if ghosts are greater than 2 blocks away,
+            # then it is worth to eat the dot
+            FinalScore += ScareTable[2]*1.2
+
+        # Evaluate pacman distance to dots, closer the better
+        # note: it should have less impact compare to nearby ghosts
+        MinDist= 9999
+        for dot in DotList.asList():
+            dist = manhattanDistance(PacmanPos, dot)
+            if( dist < MinDist ):
+                MinDist = dist
+
+        # Less the distance of closest dot, less subtraction from score
+        #FinalScore += ScareTable[8] * MinDist
+        FinalScore += -4 * MinDist
+
+        #If more walls around pacman, it is a bad spot to stay in
+
+
+
+        return(FinalScore)
+
+
+
 
 # Abbreviation
 better = betterEvaluationFunction
